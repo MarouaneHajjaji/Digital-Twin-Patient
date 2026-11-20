@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin AI — Intelligent Patient Monitoring & Deterioration Prediction</title>
+    <meta name="description" content="Engineering-level Patient Digital Twin Dashboard for continuous clinical monitoring, time-series trajectory analysis, and AI clinical deterioration prediction.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Remix Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="ri-pulse-line"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>Digital Twin AI</h2>
+                    <span>Clinical Monitoring</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a class="nav-item active" data-view="overview">
+                    <i class="ri-dashboard-3-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a class="nav-item" data-view="digital-twin">
+                    <i class="ri-body-scan-line"></i>
+                    <span>Patient Digital Twin</span>
+                </a>
+                <a class="nav-item" data-view="temporal-monitoring">
+                    <i class="ri-line-chart-line"></i>
+                    <span>Temporal Monitoring</span>
+                </a>
+                <a class="nav-item" data-view="risk-prediction">
+                    <i class="ri-shield-flash-line"></i>
+                    <span>Risk Prediction</span>
+                </a>
+                <a class="nav-item" data-view="alerts">
+                    <i class="ri-alarm-warning-line"></i>
+                    <span>Clinical Alerts</span>
+                    <span class="alert-badge-count" id="alertCountBadge">0</span>
+                </a>
+                <a class="nav-item" data-view="simulation">
+                    <i class="ri-play-circle-line"></i>
+                    <span>Twin Simulation</span>
+                </a>
+                <a class="nav-item" data-view="model-insights">
+                    <i class="ri-brain-line"></i>
+                    <span>Model Insights</span>
+                </a>
+                <a class="nav-item" data-view="system-info">
+                    <i class="ri-server-line"></i>
+                    <span>System Info</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="ai-badge">
+                    <i class="ri-cpu-line"></i>
+                    <div>
+                        <div class="ai-badge-title">RandomForest Model</div>
+                        <div class="ai-badge-sub">300 Estimators • Joblib</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="header-title">Digital Twin AI</h1>
+                    <span class="header-subtitle">Intelligent Patient Monitoring & Deterioration Prediction System</span>
+                </div>
+                
+                <div class="header-right">
+                    <div class="status-indicator online" id="aiStatus">
+                        <span class="dot"></span>
+                        <span>AI Engine Online</span>
+                    </div>
+                    <div class="status-indicator online" id="apiStatus">
+                        <span class="dot"></span>
+                        <span>API Connected</span>
+                    </div>
+                    <div class="header-time" id="headerClock">
+                        --:--:--
+                    </div>
+                    <div class="user-profile">
+                        <i class="ri-user-heart-line"></i>
+                        <span>Clinician Portal</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Patient Selector Bar -->
+            <section class="patient-selector-card">
+                <div class="selector-header">
+                    <div class="patient-identity">
+                        <div class="patient-avatar">
+                            <i class="ri-user-6-line"></i>
+                        </div>
+                        <div class="patient-meta">
+                            <div class="patient-id-row">
+                                <label for="patientSelect">Patient:</label>
+                                <select id="patientSelect" class="patient-dropdown">
+                                    <option value="PAT-0001">PAT-0001 — Marcus Vance (Septic Shock Trajectory)</option>
+                                    <option value="PAT-0002">PAT-0002 — Elena Rostova (Acute Respiratory Failure)</option>
+                                    <option value="PAT-0003">PAT-0003 — Arthur Pendelton (Post-Op Stable)</option>
+                                    <option value="PAT-0004">PAT-0004 — Sofia Al-Mansoor (Cardiogenic Risk)</option>
+                                </select>
+                            </div>
+                            <div class="patient-submeta">
+                                <span id="patAdmission">Admission: ADM-8492</span> • 
+                                <span id="patUnit">MICU-04</span> • 
+                                <span id="patDiagnosis">Severe Sepsis</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="patient-metrics">
+                        <div class="metric-item">
+                            <span class="metric-label">Age / Gender</span>
+                            <span class="metric-val" id="patDemographics">64 M</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Admission Type</span>
+                            <span class="metric-val" id="patAdmType">ED</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Comorbidity Index</span>
+                            <span class="metric-val" id="patComorbidity">4 / 10</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Monitoring Duration</span>
+                            <span class="metric-val" id="patDuration">12 Hours</span>
+                        </div>
+                        <div class="metric-item status-pill-container">
+                            <span class="status-pill active-monitoring">
+                                <i class="ri-radar-line"></i> ACTIVE MONITORING
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Timeline Scrubber & Simulation Bar -->
+            <section class="timeline-control-bar">
+                <div class="timeline-header">
+                    <div class="timeline-title">
+                        <i class="ri-time-line"></i>
+                        <span>TEMPORAL MONITORING SCRUBBER</span>
+                        <span class="current-hour-tag" id="currentHourLabel">Hour 0 of 11</span>
+                    </div>
+                    
+                    <div class="simulation-controls">
+                        <button id="btnPlaySim" class="sim-btn play-btn" title="Start Live Simulation">
+                            <i class="ri-play-fill"></i> Start Simulation
+                        </button>
+                        <button id="btnPauseSim" class="sim-btn pause-btn" disabled title="Pause Simulation">
+                            <i class="ri-pause-fill"></i> Pause
+                        </button>
+                        <button id="btnResetSim" class="sim-btn reset-btn" title="Reset to Hour 0">
+                            <i class="ri-restart-line"></i> Reset
+                        </button>
+                        
+                        <div class="speed-selector">
+                            <span>Speed:</span>
+                            <button class="speed-btn active" data-speed="1">1x</button>
+                            <button class="speed-btn" data-speed="2">2x</button>
+                            <button class="speed-btn" data-speed="5">5x</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slider-wrapper">
+                    <input type="range" id="timelineSlider" min="0" max="11" step="1" value="0">
+                    <div class="slider-ticks" id="sliderTicks">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 1: OVERVIEW (MAIN WORKSPACE)
+                 =================================================================== -->
+            <section id="view-overview" class="view-section active">
+                <div class="dashboard-grid">
+                    <!-- Left Column: Digital Twin & Current Vitals -->
+                    <div class="grid-col col-twin">
+                        <div class="card twin-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-body-scan-line"></i>
+                                    <span>PATIENT DIGITAL TWIN</span>
+                                </div>
+                                <div class="twin-sync-status">
+                                    <span class="sync-dot"></span> Synchronized
+                                </div>
+                            </div>
+                            
+                            <div class="twin-visualization-container">
+                                <div class="twin-aura-glow state-stable" id="twinAura"></div>
+                                <div class="twin-svg-wrapper">
+                                    <svg class="human-silhouette" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <radialGradient id="bodyGradient" cx="50%" cy="50%" r="50%">
+                                                <stop offset="0%" stop-color="#00f5d4" stop-opacity="0.3"/>
+                                                <stop offset="100%" stop-color="#0f172a" stop-opacity="0.8"/>
+                                            </radialGradient>
+                                            <filter id="glowFilter">
+                                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                                <feMerge>
+                                                    <feMergeNode in="coloredBlur"/>
+                                                    <feMergeNode in="SourceGraphic"/>
+                                                </feMerge>
+                                            </filter>
+                                        </defs>
+                                        <circle cx="100" cy="45" r="22" class="organ-node brain-node" id="nodeBrain" filter="url(#glowFilter)"/>
+                                        <rect x="94" y="67" width="12" height="15" rx="3" fill="#1e293b"/>
+                                        <path d="M 60,85 Q 100,75 140,85 L 132,220 Q 100,230 68,220 Z" fill="url(#bodyGradient)" stroke="#00f5d4" stroke-width="1.5" opacity="0.8"/>
+                                        <circle cx="112" cy="125" r="14" class="organ-node heart-node" id="nodeHeart" filter="url(#glowFilter)"/>
+                                        <ellipse cx="82" cy="125" rx="14" ry="20" class="organ-node lung-node" id="nodeLungL" filter="url(#glowFilter)"/>
+                                        <ellipse cx="124" cy="125" rx="10" ry="18" class="organ-node lung-node" id="nodeLungR" filter="url(#glowFilter)"/>
+                                        <circle cx="85" cy="175" r="8" class="organ-node kidney-node" id="nodeKidneyL" filter="url(#glowFilter)"/>
+                                        <circle cx="115" cy="175" r="8" class="organ-node kidney-node" id="nodeKidneyR" filter="url(#glowFilter)"/>
+                                        <path d="M 100,67 L 100,210 M 100,125 L 60,140 M 100,125 L 140,140" stroke="#00bbf9" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                                        <path d="M 60,85 L 35,180" stroke="#00f5d4" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+                                        <path d="M 140,85 L 165,180" stroke="#00f5d4" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+                                        <path d="M 78,225 L 72,360" stroke="#00f5d4" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+                                        <path d="M 122,225 L 128,360" stroke="#00f5d4" stroke-width="8" stroke-linecap="round" opacity="0.4"/>
+                                    </svg>
+                                </div>
+                                
+                                <div class="vital-badge badge-hr" id="badgeHR">
+                                    <i class="ri-heart-pulse-fill"></i>
+                                    <div class="badge-body">
+                                        <span class="badge-label">Heart Rate</span>
+                                        <span class="badge-val" id="valHR">76 <small>BPM</small></span>
+                                    </div>
+                                </div>
+                                <div class="vital-badge badge-spo2" id="badgeSpo2">
+                                    <i class="ri-lungs-fill"></i>
+                                    <div class="badge-body">
+                                        <span class="badge-label">SpO₂</span>
+                                        <span class="badge-val" id="valSpo2">98 <small>%</small></span>
+                                    </div>
+                                </div>
+                                <div class="vital-badge badge-rr" id="badgeRR">
+                                    <i class="ri-windy-line"></i>
+                                    <div class="badge-body">
+                                        <span class="badge-label">Resp. Rate</span>
+                                        <span class="badge-val" id="valRR">15 <small>/min</small></span>
+                                    </div>
+                                </div>
+                                <div class="vital-badge badge-bp" id="badgeBP">
+                                    <i class="ri-stethoscope-line"></i>
+                                    <div class="badge-body">
+                                        <span class="badge-label">Blood Pressure</span>
+                                        <span class="badge-val" id="valBP">122/78 <small>mmHg</small></span>
+                                    </div>
+                                </div>
+                                <div class="vital-badge badge-temp" id="badgeTemp">
+                                    <i class="ri-temp-hot-line"></i>
+                                    <div class="badge-body">
+                                        <span class="badge-label">Temperature</span>
+                                        <span class="badge-val" id="valTemp">36.8 <small>°C</small></span>
+                                    </div>
+                                </div>
+                                <div class="vital-badge badge-o2" id="badgeO2">
+                                    <i class="ri-drop-line"></i>
+                                    <div class="badge-body">
+                                        <span class="badge-label">O₂ Support</span>
+                                        <span class="badge-val" id="valO2">0.0 <small>L/min (none)</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="state-engine-bar">
+                                <div class="state-step state-stable active" id="stateStepStable">
+                                    <span class="step-dot"></span>
+                                    <span class="step-text">STABLE</span>
+                                </div>
+                                <i class="ri-arrow-right-s-line step-arrow"></i>
+                                <div class="state-step state-watch" id="stateStepWatch">
+                                    <span class="step-dot"></span>
+                                    <span class="step-text">WATCH</span>
+                                </div>
+                                <i class="ri-arrow-right-s-line step-arrow"></i>
+                                <div class="state-step state-at-risk" id="stateStepAtRisk">
+                                    <span class="step-dot"></span>
+                                    <span class="step-text">AT RISK</span>
+                                </div>
+                                <i class="ri-arrow-right-s-line step-arrow"></i>
+                                <div class="state-step state-high-risk" id="stateStepHighRisk">
+                                    <span class="step-dot"></span>
+                                    <span class="step-text">HIGH RISK</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center Column: Risk Prediction & Trends -->
+                    <div class="grid-col col-prediction">
+                        <div class="card risk-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-shield-flash-line"></i>
+                                    <span>CLINICAL DETERIORATION RISK</span>
+                                </div>
+                                <span class="window-pill">Window: Next 12 Hours</span>
+                            </div>
+                            <div class="risk-gauge-wrapper">
+                                <div class="radial-progress-container">
+                                    <svg class="radial-svg" viewBox="0 0 200 200">
+                                        <circle class="radial-bg" cx="100" cy="100" r="85"/>
+                                        <circle class="radial-meter" id="riskMeter" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534"/>
+                                    </svg>
+                                    <div class="radial-inner">
+                                        <div class="risk-number-group">
+                                            <span class="risk-score-value" id="riskScoreVal">2.0</span>
+                                            <span class="risk-score-unit">%</span>
+                                        </div>
+                                        <div class="risk-state-tag state-stable" id="riskStateTag">STABLE</div>
+                                    </div>
+                                </div>
+                                <div class="prediction-disclaimer">
+                                    <i class="ri-information-line"></i>
+                                    <span>Predicts probability of clinical deterioration in the next 12 hours based on temporal physiological trajectory.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card trend-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-line-chart-fill"></i>
+                                    <span>CLINICAL TREND ANALYSIS</span>
+                                </div>
+                            </div>
+                            <div class="trend-grid">
+                                <div class="trend-item" id="trendHR">
+                                    <div class="trend-meta">
+                                        <span class="trend-name">Heart Rate</span>
+                                        <span class="trend-badge stable" id="badgeTrendHR"><i class="ri-subtract-line"></i> Stable</span>
+                                    </div>
+                                    <div class="trend-values">
+                                        <span class="trend-hist" id="histHR">76 → 79 → 83</span>
+                                    </div>
+                                </div>
+                                <div class="trend-item" id="trendSpo2">
+                                    <div class="trend-meta">
+                                        <span class="trend-name">SpO₂ Level</span>
+                                        <span class="trend-badge stable" id="badgeTrendSpo2"><i class="ri-subtract-line"></i> Stable</span>
+                                    </div>
+                                    <div class="trend-values">
+                                        <span class="trend-hist" id="histSpo2">98 → 97 → 96</span>
+                                    </div>
+                                </div>
+                                <div class="trend-item" id="trendRR">
+                                    <div class="trend-meta">
+                                        <span class="trend-name">Respiratory Rate</span>
+                                        <span class="trend-badge stable" id="badgeTrendRR"><i class="ri-subtract-line"></i> Stable</span>
+                                    </div>
+                                    <div class="trend-values">
+                                        <span class="trend-hist" id="histRR">15 → 16 → 17</span>
+                                    </div>
+                                </div>
+                                <div class="trend-item" id="trendLactate">
+                                    <div class="trend-meta">
+                                        <span class="trend-name">Blood Lactate</span>
+                                        <span class="trend-badge stable" id="badgeTrendLactate"><i class="ri-subtract-line"></i> Normal</span>
+                                    </div>
+                                    <div class="trend-values">
+                                        <span class="trend-hist" id="histLactate">1.1 → 1.2 → 1.4</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-pulse-fill"></i>
+                                    <span>RISK EVOLUTION OVER TIME</span>
+                                </div>
+                            </div>
+                            <div class="chart-container-sm">
+                                <canvas id="riskEvolutionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Charts & Alerts -->
+                    <div class="grid-col col-charts">
+                        <div class="card charts-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-timeline-line"></i>
+                                    <span>TEMPORAL VITAL SIGN TRAJECTORIES</span>
+                                </div>
+                                <div class="chart-tabs">
+                                    <button class="chart-tab active" data-chart="vitals">Vitals (HR/SpO2/RR)</button>
+                                    <button class="chart-tab" data-chart="bp">BP & Temp</button>
+                                    <button class="chart-tab" data-chart="labs">Labs (Lactate/WBC/CRP)</button>
+                                </div>
+                            </div>
+                            <div class="chart-container-lg">
+                                <canvas id="temporalVitalsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card alert-card">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <i class="ri-alarm-warning-fill"></i>
+                                    <span>CLINICAL ALERTS ENGINE</span>
+                                </div>
+                                <span class="alert-status-pill" id="alertPill">System Monitoring</span>
+                            </div>
+                            <div class="alert-list" id="alertList">
+                                <div class="alert-item info">
+                                    <i class="ri-checkbox-circle-line alert-icon"></i>
+                                    <div class="alert-content">
+                                        <div class="alert-title">Patient Monitoring Active</div>
+                                        <div class="alert-desc">Baseline physiological parameters synchronized.</div>
+                                        <div class="alert-time">Hour 0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lower Section: Manual Input & Insights -->
+                <div class="secondary-grid">
+                    <div class="card input-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-edit-box-line"></i>
+                                <span>CLINICAL INPUT & MANUAL OVERRIDE</span>
+                            </div>
+                            <span class="card-subtitle-tag">Instant Model Inference</span>
+                        </div>
+                        <form id="inputForm" class="input-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="inHR">Heart Rate (BPM)</label>
+                                    <input type="number" id="inHR" value="76" min="30" max="220">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inSpo2">SpO₂ (%)</label>
+                                    <input type="number" id="inSpo2" value="98" min="50" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inRR">Resp. Rate (/min)</label>
+                                    <input type="number" id="inRR" value="15" min="5" max="60">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inSysBP">Systolic BP (mmHg)</label>
+                                    <input type="number" id="inSysBP" value="122" min="50" max="240">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inDiaBP">Diastolic BP (mmHg)</label>
+                                    <input type="number" id="inDiaBP" value="78" min="30" max="140">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inTemp">Temp (°C)</label>
+                                    <input type="number" step="0.1" id="inTemp" value="36.8" min="30" max="43">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inLactate">Lactate (mmol/L)</label>
+                                    <input type="number" step="0.1" id="inLactate" value="1.1" min="0.1" max="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inWBC">WBC (x10⁹/L)</label>
+                                    <input type="number" step="0.1" id="inWBC" value="7.8" min="0.5" max="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inCreatinine">Creatinine (mg/dL)</label>
+                                    <input type="number" step="0.1" id="inCreatinine" value="0.9" min="0.2" max="12">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inCRP">CRP (mg/L)</label>
+                                    <input type="number" step="0.1" id="inCRP" value="12.0" min="0" max="400">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inO2Device">O₂ Device</label>
+                                    <select id="inO2Device">
+                                        <option value="none">none</option>
+                                        <option value="nasal">nasal cannula</option>
+                                        <option value="mask">mask</option>
+                                        <option value="hfnc">high-flow nasal (hfnc)</option>
+                                        <option value="niv">non-invasive vent (niv)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inO2Flow">O₂ Flow (L/min)</label>
+                                    <input type="number" step="0.5" id="inO2Flow" value="0.0" min="0" max="60">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-update-twin">
+                                    <i class="ri-refresh-line"></i> Update Digital Twin & Run Inference
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card insights-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-brain-line"></i>
+                                <span>MODEL INSIGHTS & EXPLAINABILITY</span>
+                            </div>
+                        </div>
+                        <div class="insights-body">
+                            <div class="insights-subtitle">Main Contributing Risk Factors for Current Hour</div>
+                            <div class="factor-bars" id="factorBars">
+                                <div class="factor-bar-item">
+                                    <div class="factor-meta">
+                                        <span>SpO2 Level</span>
+                                        <span>Normal</span>
+                                    </div>
+                                    <div class="bar-track">
+                                        <div class="bar-fill" style="width: 10%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="global-importance-box">
+                                <div class="box-title"><i class="ri-key-2-line"></i> Global RandomForest Feature Importances</div>
+                                <div class="importance-tags" id="globalImportanceTags">
+                                    <span class="imp-tag">Lactate (15.8%)</span>
+                                    <span class="imp-tag">SpO2 (11.9%)</span>
+                                    <span class="imp-tag">CRP (7.7%)</span>
+                                    <span class="imp-tag">Systolic BP (7.3%)</span>
+                                    <span class="imp-tag">Resp. Rate (6.5%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 2: PATIENT DIGITAL TWIN
+                 =================================================================== -->
+            <section id="view-digital-twin" class="view-section">
+                <div class="architecture-flow-banner">
+                    <div class="flow-node"><i class="ri-user-heart-line"></i> Patient Data</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-history-line"></i> Temporal Data</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-body-scan-line"></i> Digital Twin</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-heart-pulse-line"></i> Current Clinical State</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-shield-flash-line"></i> Risk Prediction</div>
+                </div>
+
+                <div class="view-grid-2col">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-shield-user-line"></i>
+                                <span>DIGITAL TWIN STATUS & DEMOGRAPHICS</span>
+                            </div>
+                            <span class="status-pill active-monitoring"><i class="ri-radar-line"></i> SYNCHRONIZED</span>
+                        </div>
+                        <div class="info-prop-list">
+                            <div class="info-prop-item"><span class="info-prop-label">Patient ID</span><span class="info-prop-val" id="dtPatId">PAT-0001</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Admission Code</span><span class="info-prop-val" id="dtAdmId">ADM-8492</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Age & Gender</span><span class="info-prop-val" id="dtDemo">64 M</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Primary Diagnosis</span><span class="info-prop-val" id="dtDiagnosis">Severe Sepsis</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Clinical Unit</span><span class="info-prop-val" id="dtUnit">MICU-04</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Digital Twin State</span><span class="info-prop-val" id="dtState">STABLE 🟢</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Total Observations</span><span class="info-prop-val">12 Hourly Snapshots</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Last Synchronized</span><span class="info-prop-val" id="dtLastUpdate">Live (Hour 0)</span></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-pulse-line"></i>
+                                <span>CURRENT PHYSIOLOGICAL STATE</span>
+                            </div>
+                        </div>
+                        <div class="trend-grid">
+                            <div class="trend-item"><div class="trend-meta"><span class="trend-name">Heart Rate (HR)</span></div><div class="trend-hist" id="dtHRVal">76 BPM</div></div>
+                            <div class="trend-item"><div class="trend-meta"><span class="trend-name">Resp. Rate (RR)</span></div><div class="trend-hist" id="dtRRVal">15 /min</div></div>
+                            <div class="trend-item"><div class="trend-meta"><span class="trend-name">Systolic BP (SBP)</span></div><div class="trend-hist" id="dtBPVal">122/78 mmHg</div></div>
+                            <div class="trend-item"><div class="trend-meta"><span class="trend-name">Temperature</span></div><div class="trend-hist" id="dtTempVal">36.8 °C</div></div>
+                            <div class="trend-item"><div class="trend-meta"><span class="trend-name">Oxygen Saturation (SpO₂)</span></div><div class="trend-hist" id="dtSpo2Val">98 %</div></div>
+                            <div class="trend-item"><div class="trend-meta"><span class="trend-name">Consciousness (AVPU)</span></div><div class="trend-hist" id="dtAvpuVal">A — Alert / Oriented</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 3: TEMPORAL MONITORING
+                 =================================================================== -->
+            <section id="view-temporal-monitoring" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ri-line-chart-line"></i>
+                            <span>TEMPORAL WINDOW SELECTOR & SEQUENCE MATRIX</span>
+                        </div>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active" data-window="6">Last 6 Hours</button>
+                            <button class="chart-tab" data-window="12">Last 12 Hours</button>
+                            <button class="chart-tab" data-window="24">Last 24 Hours</button>
+                            <button class="chart-tab" data-window="all">Full Period</button>
+                        </div>
+                    </div>
+
+                    <div class="insights-subtitle">Accumulated Temporal Observation Matrix (t-4 → t0)</div>
+                    <div class="architecture-flow-banner" style="margin-top: 0.5rem;" id="temporalMatrixBanner">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="view-grid-2col">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="ri-heart-pulse-fill"></i> Heart Rate (HR) Trajectory</div></div>
+                        <div class="chart-container-lg"><canvas id="chartHRTimeline"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="ri-lungs-fill"></i> SpO₂ & Respiratory Rate Trajectory</div></div>
+                        <div class="chart-container-lg"><canvas id="chartSpo2Timeline"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 4: RISK PREDICTION — INTERACTIVE ML LABORATORY
+                 =================================================================== -->
+            <section id="view-risk-prediction" class="view-section">
+                <div class="architecture-flow-banner">
+                    <div class="flow-node"><i class="ri-edit-box-line"></i> 1. Enter Vitals & Labs</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-history-line"></i> 2. Temporal Sequence (t-3 → t0)</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-cpu-line"></i> 3. Execute ML Model</div>
+                    <i class="ri-arrow-right-line flow-arrow"></i>
+                    <div class="flow-node"><i class="ri-shield-flash-line"></i> 4. Dynamic Risk & Factors</div>
+                </div>
+
+                <div class="view-grid-2col">
+                    <!-- Left Column: Patient Parameter & Sequence Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-flask-line"></i>
+                                <span>INTERACTIVE ML INFERENCE LABORATORY</span>
+                            </div>
+                            <span class="card-subtitle-tag">RandomForest Inference</span>
+                        </div>
+
+                        <!-- Demographics & Base Info -->
+                        <div class="form-grid" style="margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label for="labAge">Age (years)</label>
+                                <input type="number" id="labAge" value="64" min="18" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="labGender">Sex</label>
+                                <select id="labGender">
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="labAdmType">Admission Type</label>
+                                <select id="labAdmType">
+                                    <option value="ED">Emergency (ED)</option>
+                                    <option value="Elective">Elective</option>
+                                    <option value="Transfer">Transfer</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="labComorb">Comorbidity Index</label>
+                                <input type="number" id="labComorb" value="4" min="0" max="10">
+                            </div>
+                        </div>
+
+                        <!-- Temporal Sequence Builder Header -->
+                        <div style="background: rgba(30, 41, 59, 0.4); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.8rem; font-weight: 700; color: var(--cyan-accent);"><i class="ri-time-line"></i> Temporal Sequence Builder (t-3 → t0)</span>
+                                <button type="button" id="btnAddObservation" class="sim-btn speed-btn" style="font-size: 0.75rem;"><i class="ri-add-line"></i> Add Observation</button>
+                            </div>
+                            <div id="observationsList" style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.2rem;">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Current Observation Parameters Form -->
+                        <form id="labPredictionForm">
+                            <div class="form-grid">
+                                <div class="form-group"><label for="labHR">Heart Rate (bpm)</label><input type="number" id="labHR" value="98" min="30" max="220"></div>
+                                <div class="form-group"><label for="labRR">Resp. Rate (breaths/min)</label><input type="number" id="labRR" value="22" min="5" max="60"></div>
+                                <div class="form-group"><label for="labSysBP">Systolic BP (mmHg)</label><input type="number" id="labSysBP" value="108" min="50" max="240"></div>
+                                <div class="form-group"><label for="labDiaBP">Diastolic BP (mmHg)</label><input type="number" id="labDiaBP" value="68" min="30" max="140"></div>
+                                <div class="form-group"><label for="labTemp">Temperature (°C)</label><input type="number" step="0.1" id="labTemp" value="38.2" min="30" max="43"></div>
+                                <div class="form-group"><label for="labSpo2">SpO₂ (%)</label><input type="number" id="labSpo2" value="92" min="50" max="100"></div>
+                                <div class="form-group"><label for="labAvpu">Consciousness (AVPU)</label><select id="labAvpu"><option value="A">Alert</option><option value="V">Voice</option><option value="P">Pain</option><option value="U">Unresponsive</option></select></div>
+                                <div class="form-group"><label for="labLactate">Lactate (mmol/L)</label><input type="number" step="0.1" id="labLactate" value="3.2" min="0.1" max="20"></div>
+                                <div class="form-group"><label for="labWBC">WBC (x10⁹/L)</label><input type="number" step="0.1" id="labWBC" value="16.5" min="0.5" max="50"></div>
+                                <div class="form-group"><label for="labCreatinine">Creatinine (mg/dL)</label><input type="number" step="0.1" id="labCreatinine" value="1.8" min="0.2" max="12"></div>
+                                <div class="form-group"><label for="labCRP">CRP (mg/L)</label><input type="number" step="0.1" id="labCRP" value="85.0" min="0" max="400"></div>
+                                <div class="form-group"><label for="labO2Device">O₂ Device</label><select id="labO2Device"><option value="none">none</option><option value="nasal">nasal</option><option value="mask" selected>mask</option><option value="hfnc">hfnc</option><option value="niv">niv</option></select></div>
+                            </div>
+
+                            <div class="form-actions" style="margin-top: 1rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                                <button type="button" id="btnResetLab" class="sim-btn reset-btn"><i class="ri-restart-line"></i> Reset Parameters</button>
+                                <button type="submit" id="btnPredictLab" class="btn-update-twin"><i class="ri-cpu-line"></i> Predict Risk</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Right Column: AI Risk Prediction Result & Visual Gauge -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="ri-shield-flash-line"></i>
+                                <span>AI RISK PREDICTION RESULT</span>
+                            </div>
+                            <span class="window-pill">Model: RandomForest</span>
+                        </div>
+
+                        <!-- Result Container -->
+                        <div id="predictionResultContainer">
+                            <div class="risk-gauge-wrapper" id="emptyPredictionState">
+                                <i class="ri-cpu-line" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 0.5rem;"></i>
+                                <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-secondary);">No Prediction Run Yet</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; text-align: center; max-width: 280px;">
+                                    Adjust parameters on the left and click "Predict Risk" to invoke the ML pipeline.
+                                </div>
+                            </div>
+
+                            <div id="activePredictionResult" style="display: none;">
+                                <div class="risk-gauge-wrapper">
+                                    <div class="radial-progress-container">
+                                        <svg class="radial-svg" viewBox="0 0 200 200">
+                                            <circle class="radial-bg" cx="100" cy="100" r="85"/>
+                                            <circle class="radial-meter" id="labRiskMeter" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534"/>
+                                        </svg>
+                                        <div class="radial-inner">
+                                            <div class="risk-number-group">
+                                                <span class="risk-score-value" id="labRiskVal" style="font-size: 2.5rem;">78.4</span>
+                                                <span class="risk-score-unit">%</span>
+                                            </div>
+                                            <div class="risk-state-tag state-high-risk" id="labRiskTag">HIGH RISK</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Compact Summary Diagram -->
+                                <div class="architecture-flow-banner" style="margin: 1rem 0; padding: 0.75rem 1rem;">
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                        <i class="ri-user-heart-line"></i> Input: HR <span id="sumHR">98</span> | SpO₂ <span id="sumSpo2">92</span>% | Lac <span id="sumLac">3.2</span>
+                                    </div>
+                                    <i class="ri-arrow-right-line flow-arrow"></i>
+                                    <div style="font-size: 0.75rem; color: var(--cyan-accent);"><i class="ri-cpu-line"></i> ML Model</div>
+                                    <i class="ri-arrow-right-line flow-arrow"></i>
+                                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-high-risk);"><i class="ri-alert-line"></i> Risk: <span id="sumRisk">78.4%</span></div>
+                                </div>
+
+                                <!-- ===================================================================
+                                     PATIENT STATE INTERPRETATION SECTION
+                                     =================================================================== -->
+                                <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 1.25rem;">
+                                    <div style="font-size: 0.9rem; font-weight: 700; color: var(--cyan-accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="ri-pulse-line"></i> PATIENT STATE INTERPRETATION
+                                    </div>
+
+                                    <!-- Patient Current State Narrative -->
+                                    <div style="background: rgba(30, 41, 59, 0.4); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; font-size: 0.82rem; color: var(--text-primary); line-height: 1.6;" id="narrativeText">
+                                        Evaluating current patient state...
+                                    </div>
+
+                                    <!-- Key Parameter Analysis Table -->
+                                    <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem;">Key Parameter Analysis</div>
+                                    <table class="matrix-table" style="margin-bottom: 1rem;">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Current Value</th>
+                                                <th>Status</th>
+                                                <th>Interpretation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="paramAnalysisBody">
+                                            <!-- Rendered by JS -->
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Temporal Trend Interpretation -->
+                                    <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem;">Temporal Evolution Analysis</div>
+                                    <div id="temporalTrendInterpretationList" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                                        <!-- Rendered by JS -->
+                                    </div>
+
+                                    <!-- Risk Explanation ("Why this prediction?") -->
+                                    <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">Why this prediction?</div>
+                                    <div style="background: rgba(30, 41, 59, 0.4); border-left: 3px solid var(--cyan-accent); border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;" id="riskExplanationText">
+                                        The predicted risk is primarily associated with...
+                                    </div>
+
+                                    <!-- Monitoring Recommendation -->
+                                    <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">Monitoring Recommendation</div>
+                                    <div style="background: rgba(0, 245, 212, 0.08); border: 1px solid rgba(0, 245, 212, 0.2); border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.8rem; color: var(--cyan-accent); font-weight: 600; margin-bottom: 1rem;" id="monitoringRecommendationText">
+                                        Continue routine monitoring...
+                                    </div>
+
+                                    <!-- AI Patient State Summary Box -->
+                                    <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1rem; margin-top: 1rem;">
+                                        <div style="font-size: 0.82rem; font-weight: 800; color: var(--cyan-accent); letter-spacing: 0.05em; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+                                            <i class="ri-file-list-3-line"></i> AI PATIENT STATE SUMMARY
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.8rem;">
+                                            <div>
+                                                <span style="color: var(--text-muted);">State:</span> <span id="sumBoxState" style="font-weight: 700; color: var(--text-primary);">—</span><br>
+                                                <span style="color: var(--text-muted);">Risk Score:</span> <span id="sumBoxScore" style="font-weight: 700; color: var(--cyan-accent);">—</span><br>
+                                                <span style="color: var(--text-muted);">Monitoring Level:</span> <span id="sumBoxLevel" style="font-weight: 600; color: var(--color-watch);">—</span><br>
+                                                <span style="color: var(--text-muted);">Temporal Pattern:</span> <span id="sumBoxTemporalPattern" style="font-weight: 600; color: var(--text-secondary);">—</span>
+                                            </div>
+                                            <div>
+                                                <span style="color: var(--text-muted);">Main Observations:</span>
+                                                <ul id="sumBoxObsList" style="margin-left: 1.2rem; margin-top: 0.2rem; color: var(--text-secondary);">
+                                                    <li style="color: var(--text-muted); font-style: italic;">Run a prediction to see observations</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Disclaimer Banner -->
+                        <div class="prediction-disclaimer" style="max-width: 100%; margin-top: 1.25rem; padding: 0.6rem 0.85rem; background: rgba(30, 41, 59, 0.4); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                            <i class="ri-information-line"></i>
+                            <span>AI-generated risk estimation based on patient observations. This result is intended for decision support and does not constitute a medical diagnosis.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prediction Session History -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ri-history-line"></i>
+                            <span>PREDICTION SESSION HISTORY</span>
+                        </div>
+                        <button type="button" id="btnClearHistory" class="sim-btn speed-btn" style="font-size: 0.75rem;"><i class="ri-delete-bin-line"></i> Clear History</button>
+                    </div>
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Risk Category</th>
+                                <th>Probability Score</th>
+                                <th>Key Vitals (HR / SpO₂ / Lactate)</th>
+                                <th>Observations Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No predictions recorded in this session.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 5: CLINICAL ALERTS
+                 =================================================================== -->
+            <section id="view-alerts" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ri-alarm-warning-fill"></i>
+                            <span>CLINICAL ALERTS HISTORY & ACTIVE QUEUE</span>
+                        </div>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active" data-alert-filter="all">All Alerts</button>
+                            <button class="chart-tab" data-alert-filter="active">Active</button>
+                            <button class="chart-tab" data-alert-filter="critical">Critical</button>
+                            <button class="chart-tab" data-alert-filter="warning">Warning</button>
+                        </div>
+                    </div>
+
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Severity</th>
+                                <th>Alert Type</th>
+                                <th>Timestamp</th>
+                                <th>Vital Sign</th>
+                                <th>Current Value</th>
+                                <th>Trend</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 6: TWIN SIMULATION
+                 =================================================================== -->
+            <section id="view-simulation" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="ri-play-circle-line"></i>
+                            <span>DIGITAL TWIN SCENARIO SIMULATOR</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                        <button class="sim-btn play-btn" id="scenarioBtnA">Scenario A: Stable Patient</button>
+                        <button class="sim-btn pause-btn" id="scenarioBtnB">Scenario B: Progressive Deterioration</button>
+                        <button class="sim-btn pause-btn" id="scenarioBtnC">Scenario C: SpO₂ Acute Drop</button>
+                        <button class="sim-btn pause-btn" id="scenarioBtnD">Scenario D: Tachycardia Spike</button>
+                    </div>
+
+                    <div class="sim-comparison-grid">
+                        <div class="sim-state-box">
+                            <div class="sim-box-title"><i class="ri-user-line"></i> CURRENT PATIENT STATE</div>
+                            <div class="info-prop-list">
+                                <div class="info-prop-item"><span class="info-prop-label">Heart Rate</span><span class="info-prop-val" id="simCurHR">76 BPM</span></div>
+                                <div class="info-prop-item"><span class="info-prop-label">SpO₂ Level</span><span class="info-prop-val" id="simCurSpo2">98%</span></div>
+                                <div class="info-prop-item"><span class="info-prop-label">Current Risk</span><span class="info-prop-val" id="simCurRisk">2.0% (STABLE)</span></div>
+                            </div>
+                        </div>
+
+                        <div class="sim-state-box" style="border-color: var(--cyan-accent);">
+                            <div class="sim-box-title"><i class="ri-cpu-line"></i> SIMULATED PATIENT STATE</div>
+                            <div class="info-prop-list">
+                                <div class="info-prop-item"><span class="info-prop-label">Simulated Risk</span><span class="info-prop-val" id="simSimRisk">2.0%</span></div>
+                                <div class="info-prop-item"><span class="info-prop-label">Risk Delta</span><span id="simRiskDelta" class="delta-pill risk-down">0.0% Change</span></div>
+                                <div class="info-prop-item"><span class="info-prop-label">Simulated State</span><span class="info-prop-val" id="simSimState">STABLE</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 7: MODEL INSIGHTS
+                 =================================================================== -->
+            <section id="view-model-insights" class="view-section">
+                <div class="view-grid-2col">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="ri-brain-line"></i> GLOBAL FEATURE IMPORTANCES</div></div>
+                        <div class="insights-body">
+                            <div class="global-importance-box">
+                                <div class="box-title"><i class="ri-key-2-line"></i> RandomForest Trees Feature Weights</div>
+                                <div class="importance-tags" id="fullModelImportanceTags">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="ri-line-chart-line"></i> MODEL PERFORMANCE & METRICS</div></div>
+                        <div class="info-prop-list">
+                            <div class="info-prop-item"><span class="info-prop-label">Algorithm</span><span class="info-prop-val">RandomForestClassifier</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Estimators</span><span class="info-prop-val">300 Decision Trees</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Class Weighting</span><span class="info-prop-val">balanced_subsample</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">AUC-ROC Metric</span><span class="info-prop-val">0.892</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Precision</span><span class="info-prop-val">0.841</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Recall</span><span class="info-prop-val">0.865</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 PAGE VIEW 8: SYSTEM INFO
+                 =================================================================== -->
+            <section id="view-system-info" class="view-section">
+                <div class="system-info-grid">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="ri-cpu-line"></i> MODEL ARCHITECTURE</div></div>
+                        <div class="info-prop-list">
+                            <div class="info-prop-item"><span class="info-prop-label">Model File</span><span class="info-prop-val">best_model.joblib (324 MB)</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Pipeline Type</span><span class="info-prop-val">Sklearn Pipeline (Pre + RF)</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Numerical Features</span><span class="info-prop-val">18 Features</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Categorical Features</span><span class="info-prop-val">3 Features (O2, Gender, Admission)</span></div>
+                            <div class="info-prop-item"><span class="info-prop-label">Prediction Window</span><span class="info-prop-val">Next 12 Hours</span></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="ri-git-merge-line"></i> DATA PIPELINE ARCHITECTURE</div></div>
+                        <div class="architecture-flow-banner" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+                            <div class="flow-node"><i class="ri-database-line"></i> 1. Patient Temporal Observations</div>
+                            <div class="flow-node"><i class="ri-filter-3-line"></i> 2. SimpleImputer & StandardScaler</div>
+                            <div class="flow-node"><i class="ri-node-tree"></i> 3. 300 RandomForest Estimators</div>
+                            <div class="flow-node"><i class="ri-pulse-line"></i> 4. Digital Twin Synchronized State</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application JS Modules -->
+    <script src="js/api.js"></script>
+    <script src="js/digitalTwin.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/simulation.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
