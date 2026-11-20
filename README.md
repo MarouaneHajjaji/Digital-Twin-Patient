@@ -116,3 +116,16 @@ The backend handles feature ordering, missing value defaults, and calibrates raw
 
 - **Simulation Scope**: Designed as an engineering prototype for PFA demonstration.
 - **Medical Use**: Not intended for direct clinical diagnostic or therapeutic decision-making without independent medical validation.
+
+## 8. Application Screenshots
+
+### Dashboard
+![Dashboard](assets/screenshots/Dashboard.png)
+
+### Patient Monitoring
+![Patient Monitoring](assets\screenshots\Design sans titre.gif)
+
+### Prediction
+![Prediction](assets\screenshots\PatientDigitalTwin.png)
+![Prediction](assets\screenshots\RiskPrediction.png)
+
